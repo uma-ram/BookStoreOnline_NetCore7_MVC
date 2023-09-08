@@ -1,0 +1,10 @@
+Add to cart
+
+1. get user id
+2. addCart(bookid, qty, unitprice, userid)
+    To maintain automicity property of Acid rule, use transaction in db. so that, if error in between, then full operation will be rolled back. otherwise either one table will be updated and not a complete operation which has to be avoided. 
+	1. check user has entry in shapping cart.
+		1. if yes, check for entry with same book details in cartdetails. if yes, just update the qty by adding it to the existing qty. else add new record in cartdetail table.
+		2. if no, create new entrt in shopping cart and then in cartdetails.
+
+	

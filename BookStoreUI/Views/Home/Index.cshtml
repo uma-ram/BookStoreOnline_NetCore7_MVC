@@ -1,0 +1,59 @@
+﻿@model BookDisplayModel 
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="my-4">
+    <form asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center"> 
+
+      <div class="col-12">
+            <label class="visually-hidden" for="genreID">Genres</label>
+            <select class="form-select" id="genreID" name="genreID">
+          <option selected>Choose...</option>
+          @foreach(var genre in Model.Genres)
+          {
+              <option selected ="@(genre.Id == Model.GenreID)" value="@genre.Id">@genre.GenreName</option>
+          }        
+        </select>
+      </div>
+
+    <div class="col-12">
+            <label class="visually-hidden" for="sTerm">Search by title</label>
+        <div class="input-group">
+            <div class="input-group-text"></div>
+            <input type="text" class="form-control" id="sTerm" value="@Model.STerm" name ="sTerm" placeholder="Search by title">
+        </div>
+    </div>
+
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">Search</button>
+            <a href="/Home/Index" class="btn btn-secondary">Reset</a>
+      </div>
+    </form>
+</div>
+<div class="w-100 mt-4 d-flex flex-wrap">
+        @foreach (var book in Model.Books){
+    <div class="card mx-3 mb-4" style="width: 11rem;">
+        @if(string.IsNullOrEmpty(book.Image))
+        {
+                <img style="width:100%;height:180px"  src="/images/NoImage.jpg" class="card-img-top" alt="...">
+        }
+        else
+        {
+                <img style="width:100%;height:180px" src="/images/@book.Image" class="card-img-top" alt="...">
+        }
+            
+        <div class="card-body">
+            <h5 class="card-title">@book.BookName</h5>
+            <p class="card-text">
+                <b>Genre:</b> @book.GenreName  <br />
+                <b>Author:</b> @book.AuthorName <br />
+                <b>Price:</b>@book.Price
+            </p>
+            <button type="button" onclick="add(@book.Id)" class="btn btn-primary">Add To Cart</button>
+        </div>
+    </div>
+    }
+</div>
+@section Scripts{
+
+}
