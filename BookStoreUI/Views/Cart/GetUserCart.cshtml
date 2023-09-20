@@ -1,0 +1,59 @@
+﻿@model ShoppingCart
+<div style="width:90%;margin:auto;" class="mt-2">
+    @if(Model.CartDetails!=null && Model.CartDetails.Count() > 0)
+    {
+        
+        <div class="my-2 flex-fill">
+            <h4>My Cart Items</h4>
+            <a class="btn btn-primary btn-lg float-right" href="/Cart/CheckOut">Check Out</a>
+        </div>
+        <table class="table table-striped">
+            <tr class="table-light">
+                <th>Genre</th>
+                <th>Book Name</th>
+                <th>Book Image</th>
+                <th>Unit Price(£)</th>
+                <th>Quantity</th>
+                <th>Amount(£)</th>
+                <th>Action</th>
+            </tr>
+            @foreach(var item in Model.CartDetails)
+            {
+                <tr>
+                    <td>@item.Book.Genre.GenreName</td>
+                    <td>@item.Book.BookName</td>
+                    <td>
+                        @if(string.IsNullOrEmpty(item.Book.Image))
+                        {
+                            <img src="/Images/NoImage.jpg" style="width:80px;height:100px;">
+                        }
+                        else
+                        {
+                            <img src="/Images/@item.Book.Image" style="width:80px;height:100px;">
+                        }
+                    </td>
+                    <td>@item.Book.Price</td>
+                    <td>@item.Quantity</td>
+                    <td>@((item.Quantity * item.Book.Price).ToString("0.00"))</td>
+                    <td>
+                        <a href="/Cart/AddItem?bookId=@item.Book.Id&redirect=1" class="btn btn-info">+</a>
+                        <a href="/Cart/RemoveItem?bookId=@item.Book.Id" class="btn btn-info">-</a>
+                    </td>
+                    
+                </tr>
+            }
+            <tr>
+                <td></td>
+                <td colspan="5" style="text-align:right">Total Amount(£): </td>
+                <td colspan="2">
+                    @(Model.CartDetails.Select(item=>item.Quantity * item.Book.Price).Sum().ToString("0.00"))
+                </td>
+            </tr>
+        </table>
+        
+    }
+    else
+    {
+        <h4> No items in cart.</h4>
+    }
+</div>

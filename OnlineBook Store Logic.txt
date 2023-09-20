@@ -1,5 +1,13 @@
-Add to cart
+Main Flow of Logic:
+_______________________
+1.Search and find the book
+2. Add to cart, if logged in or redirect to login page
+3. Increase or decreased quantity in cart
+4. Do Check out -> cart details will be moved to order and orderdetails
+5. Then change order status in order 
 
+Add to cart
+******************
 1. get user id
 2. addCart(bookid, qty, unitprice, userid)
     To maintain automicity property of Acid rule, use transaction in db. so that, if error in between, then full operation will be rolled back. otherwise either one table will be updated and not a complete operation which has to be avoided. 
@@ -7,4 +15,13 @@ Add to cart
 		1. if yes, check for entry with same book details in cartdetails. if yes, just update the qty by adding it to the existing qty. else add new record in cartdetail table.
 		2. if no, create new entrt in shopping cart and then in cartdetails.
 
+
 	
+Order Status Code:
+******************
+1-Pending
+2-Shipped
+3-Delivered
+4-Cancelled
+5-Returned
+6-Refund

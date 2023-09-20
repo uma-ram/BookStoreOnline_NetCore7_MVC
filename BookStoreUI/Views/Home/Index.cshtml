@@ -48,6 +48,7 @@
                 <b>Genre:</b> @book.GenreName  <br />
                 <b>Author:</b> @book.AuthorName <br />
                 <b>Price:</b>@book.Price
+                    
             </p>
             <button type="button" onclick="add(@book.Id)" class="btn btn-primary">Add To Cart</button>
         </div>
@@ -55,5 +56,26 @@
     }
 </div>
 @section Scripts{
+    <script>
+        async function add(bookId){
+            var usernameEl = document.getElementById("username");
+            if (usernameEl == null) {
+                alert("inside user check");
+                window.location.href = "/Identity/Account/Login";
+            }
+            try {
+                var response = await fetch(`/Cart/AddItem?bookId=${bookId}`);
+                if (response.status == 200) {
+                    var responseText = await response.json();
+                    var cartItemElement = document.getElementById('cartItemCount');
+                    cartItemElement.innerHTML = responseText;
+                        window.location.href = "#cartItemCount";
 
+                }
+            }
+            catch (err) {
+                console.log(err);
+            }
+        }
+    </script>
 }

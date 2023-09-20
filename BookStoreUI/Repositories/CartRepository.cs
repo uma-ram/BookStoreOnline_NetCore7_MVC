@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Security.Cryptography.Xml;
 
 namespace BookStoreUI.Repositories
 {
@@ -7,9 +10,9 @@ namespace BookStoreUI.Repositories
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly HttpContextAccessor _httpContextAccessor;  //To get claimprincipal of the logged in user
+        private readonly IHttpContextAccessor _httpContextAccessor;  //To get claimprincipal of the logged in user
 
-        public CartRepository(ApplicationDbContext db,UserManager<IdentityUser> userManager,HttpContextAccessor httpContextAccessor)
+        public CartRepository(ApplicationDbContext db,UserManager<IdentityUser> userManager,IHttpContextAccessor httpContextAccessor)
         {
             _db = db;
             _userManager = userManager;
@@ -48,12 +51,13 @@ namespace BookStoreUI.Repositories
                 }
                 else
                 {
+                    var book = _db.Books.Find(bookID); 
                     cartItem = new CartDetail
                     {
                         BookId = bookID,
                         Quantity = qty,
-                        ShoppingCartId = cart.Id
-                        //UnitPrice = price
+                        ShoppingCartId = cart.Id,
+                        UnitPrice = book.Price
                     };
                     _db.CartDetails.Add(cartItem);
                 }
@@ -136,7 +140,7 @@ namespace BookStoreUI.Repositories
 
         public async Task<int> GetCartItemCount(string userID="")
         {
-            if (!(string.IsNullOrEmpty(userID)))
+            if ((string.IsNullOrEmpty(userID)))
             {
                 userID = GetUserID();
             }
@@ -144,13 +148,66 @@ namespace BookStoreUI.Repositories
             var cartItems = await (from cart in _db.ShoppingCarts
                                    join cartDetail in _db.CartDetails
                                    on cart.Id equals cartDetail.ShoppingCartId
+                                   where cart.UserId == userID
                                    select new { cartDetail.Id }
                                   ).ToListAsync();
             return cartItems.Count;
         }
+        public async  Task<bool> DoCheckOut()
+        {
+            using var transaction = _db.Database.BeginTransaction();
+            try
+            {
+                //Logic->
+                //Move records from cartdetails to order and order details and then delete from cart details.
 
+                var userID = GetUserID();
+                if (string.IsNullOrEmpty(userID))
+                    throw new Exception("User Not Logged In");
+                var cart =await GetCart(userID);
+                if (cart is null)
+                    throw new Exception("Invalid Cart");
+                var cartDetails = _db.CartDetails
+                                    .Where(a => a.ShoppingCartId == cart.Id).ToList();
+                if (cartDetails.Count() == 0)
+                    throw new Exception("Cart is empty");
+
+                var order = new Order
+                {
+                    UserId = userID,
+                    OrderStatusId = 1, // pending
+                    CreateDate = DateTime.UtcNow
+                };
+                _db.Orders.Add(order);
+                _db.SaveChanges();
+
+                foreach(var item in cartDetails)
+                {
+                    var orderDetails = new OrderDetail
+                    {
+                        OrderId = order.Id,
+                        Quantity = item.Quantity,
+                        UnitPrice = item.UnitPrice,
+                        BookId = item.BookId
+                    };
+                    _db.OrderDetails.Add(orderDetails);
+                }
+                _db.SaveChanges();
+
+                //remove cartdetails 
+                _db.CartDetails.RemoveRange(cartDetails);
+                _db.SaveChanges();
+                transaction.Commit();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+
+        }
         
-        //Get userid from Claim principal
+        //Get userid from Claim principal - private method=>can be public in separete file
 
         private string GetUserID()
         {
@@ -158,6 +215,9 @@ namespace BookStoreUI.Repositories
             string userID = _userManager.GetUserId(principal);
             return userID;
         }
+
+
+
 
     }
 }

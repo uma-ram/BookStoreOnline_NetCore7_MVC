@@ -13,7 +13,7 @@ namespace BookStoreUI.Controllers
             _cartRepository = cartRepository;
         }
         //Add new item to cart
-        public async Task<IActionResult> AddItem(int bookID, int qty, int redirect=0)
+        public async Task<IActionResult> AddItem(int bookID, int qty=1, int redirect=0)
         {
             var cartCount = await _cartRepository.AddToCart(bookID, qty);
             if (redirect == 0)
@@ -38,6 +38,14 @@ namespace BookStoreUI.Controllers
         {
             var itemCount = await _cartRepository.GetCartItemCount();
             return Ok(itemCount);
+        }
+
+        public async Task<IActionResult> CheckOut()
+        {
+            var isCheckOut = await _cartRepository.DoCheckOut();
+            if(!isCheckOut)
+                throw new Exception("Something happen in server side");
+            return RedirectToAction("Index","Home");
         }
     }
 }

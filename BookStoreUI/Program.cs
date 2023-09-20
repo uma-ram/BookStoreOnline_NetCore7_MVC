@@ -18,8 +18,10 @@ builder.Services
     .AddDefaultTokenProviders();
 builder.Services.AddControllersWithViews();
 //uma - registering the homerepository as service to use dependency injection feature
+//builder.Services.AddHttpContextAccessor(); -added to tst the error
 builder.Services.AddTransient<IHomeRepository, HomeRepository>();
 builder.Services.AddTransient<ICartRepository, CartRepository>();
+builder.Services.AddTransient<IUserOrderRepository, UserOrderRepository>();
 
 
 //uma done

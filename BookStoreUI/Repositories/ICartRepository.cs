@@ -9,5 +9,7 @@
 
         Task<ShoppingCart> GetCart(string userID);
         Task<int> GetCartItemCount(string userID = "");
+
+        Task<bool> DoCheckOut();
     }
 }

@@ -1,0 +1,71 @@
+﻿@model IEnumerable<Order>
+
+<div style="width:100%" class="mt-2">
+    <h4>User Orders</h4>
+    
+    @if(Model!=null && Model.Count()>0){
+        <table class="table table-striped">
+            <tr>
+                <th>Order Date</th>
+                <th>Order Status</th>
+            </tr>
+            @foreach(var order in Model)
+            {
+                <tr>
+                    <td>@order.CreateDate.ToString("dd-MM-yyyy")</td>
+                    <td>@order.OrderStatus.StatusName</td>
+                </tr>
+                @if(order.OrderDetail!=null && order.OrderDetail.Count()>0)
+                {
+                    <tr>
+                        <td>
+                            <table class="table table-striped">
+                                <tr>
+                                    <td>Grand Total(£):</td>
+                                    <td>
+                                        @(order.OrderDetail.Select(item=>item.Quantity * item.Book.Price).Sum().ToString("0.00"));
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Genre</th>
+                                    <th>Book Name</th>
+                                    <th>Image </th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price(£)</th>
+                                    <th>Total Price(£)</th>
+
+                                </tr>
+                                @foreach(var item in order.OrderDetail)
+                                {
+                                <tr>
+                                    <td>@item.Book.Genre.GenreName</td>
+                                    <td>@item.Book.BookName</td>
+                                    <td>
+                                        @if(string.IsNullOrEmpty(item.Book.Image))
+                                            {
+                                                <img src="/Images/NoImage.jpg" style="width:80px;height:100px;">
+                                            }
+                                            else
+                                            {
+                                                <img src="/Images/@item.Book.Image" style="width:80px;height:100px;">
+
+                                            }
+                                        </td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.Book.Price</td>
+                                        <td>@((item.Quantity * item.Book.Price).ToString("0.00"))</td>
+                                </tr>
+                                }
+                            </table>
+                        </td>
+                    </tr>
+                }
+            }
+        </table>
+    }
+    else
+    {
+        <h5>No orders!!!</h5>
+    }
+</div>
