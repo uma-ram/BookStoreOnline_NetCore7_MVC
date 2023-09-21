@@ -149,9 +149,9 @@ namespace BookStoreUI.Repositories
                                    join cartDetail in _db.CartDetails
                                    on cart.Id equals cartDetail.ShoppingCartId
                                    where cart.UserId == userID
-                                   select new { cartDetail.Id }
+                                   select new { cartDetail.Quantity }
                                   ).ToListAsync();
-            return cartItems.Count;
+            return cartItems.Select(a=>a.Quantity).Sum();
         }
         public async  Task<bool> DoCheckOut()
         {

@@ -1,0 +1,10 @@
+1. Check why username is dispalyed every first time.
+2. Add to cart -> inceases total count instead of jus book count
+3. modify display of items in order details It should list in 1 table
+4. Imagine in order pages, place a button for payment -> on pressing this, change the status of order to payment done and to shipping
+5. Admin user can update the order status as delivered
+6. Try for cancelled/ returned/refund scenarios
+
+7. On role-based, admin has to add/edit/modify genre and book details.
+8. how to change the details in shopping cart to deleted ??????
+9. Add my orders indrop down menu for username to select -->Done 
